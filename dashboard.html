@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<p class="date-line">Today: {{ today }}</p>
+
+<div class="stats">
+    <div class="stat-card total">
+        <span class="stat-number">{{ total_count }}</span>
+        <span class="stat-label">Total Students</span>
+    </div>
+    <div class="stat-card present">
+        <span class="stat-number">{{ present_count }}</span>
+        <span class="stat-label">Present</span>
+    </div>
+    <div class="stat-card absent">
+        <span class="stat-number">{{ absent_count }}</span>
+        <span class="stat-label">Absent</span>
+    </div>
+</div>
+
+<div class="add-student">
+    <h3>Add a Student</h3>
+    <form method="POST" action="{{ url_for('add_student') }}">
+        <input type="text" name="name" placeholder="Full name" required>
+        <input type="text" name="roll_no" placeholder="Roll number" required>
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<h3>Roster</h3>
+<table class="roster">
+    <thead>
+        <tr>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Last Marked</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in students %}
+        <tr class="{{ 'row-present' if s.status == 'Present' else 'row-absent' }}">
+            <td>{{ s.roll_no }}</td>
+            <td>{{ s.name }}</td>
+            <td><span class="badge {{ 'badge-present' if s.status == 'Present' else 'badge-absent' }}">{{ s.status }}</span></td>
+            <td>{{ s.date_marked }}</td>
+            <td>
+                <a class="btn-toggle" href="{{ url_for('toggle_status', student_id=s.id) }}">
+                    Mark {{ 'Absent' if s.status == 'Present' else 'Present' }}
+                </a>
+                <a class="btn-delete" href="{{ url_for('delete_student', student_id=s.id) }}"
+                   onclick="return confirm('Remove {{ s.name }}?');">Delete</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" class="empty">No students yet — add one above.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
